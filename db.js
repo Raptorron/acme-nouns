@@ -1,7 +1,7 @@
 const Sequelize = require('sequelize');
 const {STRING, UUID, UUIDV4} = Sequelize;
 
-const conn = new Sequelize(process.envDATABASE_URL || 'postgres://localhost/acme_noun_db');
+const conn = new Sequelize('postgres://localhost/acme_noun_db');
 
 
 
@@ -14,6 +14,7 @@ const Person = conn.define('person', {
   name: {
     type: STRING,
     allowNull: false,
+    validate: { notEmpty: true },
     unique: true
   }
 });
@@ -27,6 +28,7 @@ const Place = conn.define('place', {
   name: {
     type: STRING,
     allowNull: false,
+    validate: { notEmpty: true },
     unique: true
   }
 });
@@ -40,21 +42,45 @@ const Thing = conn.define('thing', {
   name: {
     type: STRING,
     allowNull: false,
+    validate: { notEmpty: true },
     unique: true
   }
 });
 
 Person.belongsTo(Place);
 Place.hasMany(Person);
-Place.belongsTo(Thing);
-Thing.hasMany(Place);
+
+Thing.belongsTo(Person);
+Person.hasMany(Thing);
 
 const syncAndSeed = async ()=>{
   await conn.sync({force: true});
+//place
+const [ work, school ] = await Promise.all([
+
+  Place.create({name: 'work'}),
+  Place.create({name: 'school'})
+
+])
+//person
+
+//things
+const [ toy, notebook, car, laptop, lunchbox ] = await Promise.all()
+  const things = [
+    {name: 'toy'},
+    {name: 'notebook'},
+    {name: 'car'},
+    {name: 'laptop'},
+    {name: 'lunchbox'}
+  ]
+
+
 
 
 
 };
+
+syncAndSeed();
 
 module.exports={
   syncAndSeed,
